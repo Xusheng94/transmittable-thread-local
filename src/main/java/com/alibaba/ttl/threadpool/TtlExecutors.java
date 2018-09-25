@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * Factory Utils for getting TTL Wrapper of jdk executors.
+ * Factory Utils for getting TTL wrapper of jdk executors.
  *
  * @author Jerry Lee (oldratlee at gmail dot com)
  * @see java.util.concurrent.Executor
@@ -54,6 +54,28 @@ public final class TtlExecutors {
             return scheduledExecutorService;
         }
         return new ScheduledExecutorServiceTtlWrapper(scheduledExecutorService);
+    }
+
+    /**
+     * Unwrap TTL wrapper executor instance to the original/underneath one.
+     *
+     * @param executor TTL wrapper instance of jdk executor
+     * @param <T>      Executor type
+     * @return the original/underneath executor
+     * @throws NullPointerException     parameter executor is null
+     * @throws IllegalArgumentException input executor is not TTL wrapper executor
+     * @see #getTtlExecutor(Executor)
+     * @see #getTtlExecutorService(ExecutorService)
+     * @see #getTtlScheduledExecutorService(ScheduledExecutorService)
+     * @since 2.8.0
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Executor> T unwrap(T executor) {
+        if (executor == null) throw new NullPointerException("parameter executor is null");
+        if (!(executor instanceof ExecutorTtlWrapper))
+            throw new IllegalArgumentException("parameter executor not TTL executor wrapper");
+
+        return (T) ((ExecutorTtlWrapper) executor).unwrap();
     }
 
     private TtlExecutors() {
